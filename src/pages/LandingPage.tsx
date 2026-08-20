@@ -36,10 +36,10 @@ const LandingPage: React.FC = () => {
       setIsGateOpen(true);
     }, 800);
 
-    // 요건: 3.4초 후(0.8초 대기 + 2.5초 슬라이드 이동 + 여유 마진 0.1초) 철장 DOM을 영구 제거
+    // 요건: 3.7초 후(0.8초 대기 + 2.8초 슬라이드 이동 + 여유 마진 0.1초) 철장 DOM을 영구 제거
     const destroyTimer = setTimeout(() => {
       setIsGateActive(false);
-    }, 3400);
+    }, 3700);
 
     return () => {
       clearTimeout(openTimer);
