@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import LiveAppPreview from "../components/LiveAppPreview";
@@ -15,23 +15,36 @@ const BOTTLE_IMAGES = [
 const LandingPage: React.FC = () => {
   const [isBottleVisible, setIsBottleVisible] = useState(false);
   const [bottleIndex, setBottleIndex] = useState(0);
+  const hasOpenedOnceRef = useRef(false);
 
+  // 1. 향수병 이미지들 초기에 전부 Preload (메모리 캐싱 완료)
+  useEffect(() => {
+    BOTTLE_IMAGES.forEach((src) => {
+      const preloadedImage = new Image();
+      preloadedImage.src = src;
+    });
+  }, []);
+
+  // 2. 로고 클릭 시 호출되는 토글 및 이미지 스왑 핵심 로직
   const handleLogoClick = () => {
     setIsBottleVisible((prevVisible) => {
       const nextVisible = !prevVisible;
       
-      console.log(`Logo clicked. isBottleVisible will be: ${nextVisible}`);
-      
-      if (!nextVisible) {
-        // 닫히는 애니메이션(800ms)이 끝난 뒤 다음 인덱스로 변경 (깜빡임 방지)
-        setTimeout(() => {
+      if (nextVisible) {
+        // [열리는 시점]: 이미지가 슬라이드 시작 전 완전히 준비되도록 먼저 변경
+        if (hasOpenedOnceRef.current) {
           setBottleIndex((prevIndex) => {
             const nextIndex = (prevIndex + 1) % BOTTLE_IMAGES.length;
-            console.log(`Perfume bottle index changed: ${prevIndex} -> ${nextIndex} (${BOTTLE_IMAGES[nextIndex]})`);
+            console.log(`Perfume bottle index swapped immediately on open click: ${prevIndex} -> ${nextIndex}`);
             return nextIndex;
           });
-        }, 800);
+        } else {
+          hasOpenedOnceRef.current = true; // 최초 오픈 플래그 세팅
+          console.log(`First perfume bottle opened: index 0`);
+        }
       }
+      // [닫히는 시점]: 이미지는 그대로 둔 채 슬라이드 아웃만 진행 (깜빡임 없음)
+      
       return nextVisible;
     });
   };
