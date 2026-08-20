@@ -626,6 +626,35 @@ html, body {
   }
 }
 
+/* Header Logo Button hover scale feedback */
+.header-logo-btn:hover .header-logo {
+  opacity: 0.75;
+  transform: scale(1.02);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Sliding Perfume Bottle Style */
+.slide-perfume-bottle {
+  position: fixed;
+  left: -8vw; /* 자연스럽게 화면 왼쪽에 절반쯤 걸쳐서 안착하도록 마이너스 오프셋 적용 */
+  bottom: 5vh;
+  height: 85vh; /* 화면 높이의 약 80~90% */
+  width: auto;
+  max-width: 50vw; /* 화면의 왼쪽 절반 수준 차지 */
+  object-fit: contain; /* 비율 유지, 찌그러짐 방지 */
+  z-index: 50; /* 헤더(z-index: 100) 보다는 아래, 일반 콘텐츠 보다는 위 */
+  pointer-events: none; /* 클릭을 방해하지 않고 레이아웃 스크롤 방지 */
+  
+  /* 슬라이딩 애니메이션 트랜지션 (0.8초, cubic-bezier 부드러운 감속) */
+  transform: translateX(-100%);
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Active slide position */
+.slide-perfume-bottle.show {
+  transform: translateX(0);
+}
+
 /* Responsive Rules */
 @media (max-width: 1280px) {
   .landing-main-content {

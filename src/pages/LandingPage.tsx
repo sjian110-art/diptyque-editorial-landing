@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import LiveAppPreview from "../components/LiveAppPreview";
 import EnvelopeExperience from "../components/EnvelopeExperience";
 
 const LandingPage: React.FC = () => {
+  const [isBottleVisible, setIsBottleVisible] = useState(false);
+
   const handleSearchScent = (selections: string[]) => {
     console.log("Search Scent triggered with selections:", selections);
   };
@@ -18,7 +20,14 @@ const LandingPage: React.FC = () => {
       {/* Background image overlay to match premium aesthetic */}
       <div className="landing-background-overlay" />
       
-      <Header />
+      <Header onLogoClick={() => setIsBottleVisible((prev) => !prev)} />
+      
+      {/* Sliding Perfume Bottle (Fixed overlay on the left) */}
+      <img
+        src="/assets/Diptyque_bottle.png"
+        alt="Diptyque Perfume Bottle"
+        className={`slide-perfume-bottle ${isBottleVisible ? "show" : ""}`}
+      />
       
       <main className="landing-main-content">
         <div className="left-preview-section">

@@ -2,14 +2,28 @@ import React from "react";
 
 export interface HeaderProps {
   onMenuClick?: (menu: string) => void;
+  onLogoClick?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
+const Header: React.FC<HeaderProps> = ({ onMenuClick, onLogoClick }) => {
   const menuItems = ["Fragrances", "Home Decor", "Gifts", "Our Story"];
 
   return (
     <header className="landing-header">
-      <div className="header-logo">DIPTYQUE</div>
+      <button 
+        className="header-logo-btn" 
+        onClick={onLogoClick}
+        aria-label="Toggle Perfume Bottle"
+        style={{
+          background: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+          padding: 0,
+          textAlign: 'left'
+        }}
+      >
+        <div className="header-logo">DIPTYQUE</div>
+      </button>
       
       <nav className="header-nav">
         {menuItems.map((item) => (
