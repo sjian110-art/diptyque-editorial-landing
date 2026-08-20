@@ -722,7 +722,7 @@ html, body {
 .gate-slice {
   width: 26vw; /* Slightly wider than 25vw to allow overlap */
   height: 100vh;
-  background-image: url('/assets/steel.png');
+  background-image: url('/assets/steel2.png');
   
   /* [중요] 가로로 Stretch 하지 않고 원본 비율을 보존하여 철봉 두께와 장식 비율 유지 */
   background-size: cover;
