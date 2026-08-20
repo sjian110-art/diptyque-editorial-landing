@@ -464,11 +464,12 @@ html, body {
   border-radius: 6px;
   font-family: var(--font-sans);
   font-size: 14px;
-  font-weight: 700; /* Bold as requested */
+  font-weight: 700;
   cursor: pointer;
   letter-spacing: 0.05em;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  margin-top: 24px; /* Maintain consistent margin from content, pushes card height naturally */
+  /* transform은 transition에서 제외 – shake 시 중간값이 보간되어 흔들림이 뭉개지는 현상 방지 */
+  transition: background-color var(--transition-fast);
+  margin-top: 24px;
 }
 
 .card-submit-btn:hover {
@@ -514,21 +515,26 @@ html, body {
   }
 }
 
-/* Shake animation – validation feedback when no option is selected */
+/* Shake animation – 옵션 미선택 시 "안 돼요!" 거부 피드백 */
+/* opacity:1을 모든 프레임에 명시 → .tab-pane>* fadeIn forwards 충돌 완전 차단 */
 @keyframes btnShake {
-  0%   { transform: translateX(0); }
-  14%  { transform: translateX(-7px); }
-  28%  { transform: translateX(7px); }
-  42%  { transform: translateX(-6px); }
-  56%  { transform: translateX(6px); }
-  70%  { transform: translateX(-4px); }
-  84%  { transform: translateX(4px); }
-  100% { transform: translateX(0); }
+  0%   { transform: translateX(0);     opacity: 1; }
+  10%  { transform: translateX(-12px); opacity: 1; }
+  21%  { transform: translateX(12px);  opacity: 1; }
+  32%  { transform: translateX(-10px); opacity: 1; }
+  43%  { transform: translateX(10px);  opacity: 1; }
+  54%  { transform: translateX(-8px);  opacity: 1; }
+  65%  { transform: translateX(8px);   opacity: 1; }
+  76%  { transform: translateX(-4px);  opacity: 1; }
+  87%  { transform: translateX(4px);   opacity: 1; }
+  100% { transform: translateX(0);     opacity: 1; }
 }
 
 .card-submit-btn.shake {
-  animation: btnShake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-  /* pointer-events 유지 – 흔들리는 동안에도 클릭 가능하나 검증 로직에서 재차 차단 */
+  /* !important: .tab-pane>* animation 규칙을 확실히 덮어씀 */
+  animation: btnShake 0.6s ease-in-out both !important;
+  /* transition 비활성화: transform transition이 shake 중간값을 보간하지 않도록 */
+  transition: none !important;
 }
 
 /* Fade-in Animation */

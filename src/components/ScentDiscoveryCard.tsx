@@ -95,19 +95,15 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
   
   const previousRecRef = useRef<Perfume | null>(null);
   const dotsIntervalRef = useRef<number | null>(null);
-  // Refs for the submit buttons – used to trigger shake animation directly on DOM
+  // Refs to the submit buttons – for direct DOM class manipulation on shake
   const scentBtnRef = useRef<HTMLButtonElement | null>(null);
   const memoryBtnRef = useRef<HTMLButtonElement | null>(null);
-  // Accumulated setTimeout IDs for the shake sequence
-  const shakeTimersRef = useRef<number[]>([]);
 
   useEffect(() => {
     return () => {
       if (dotsIntervalRef.current !== null) {
         window.clearInterval(dotsIntervalRef.current);
       }
-      // shake 타이머 전부 정리
-      shakeTimersRef.current.forEach((id) => window.clearTimeout(id));
     };
   }, []);
 
@@ -126,49 +122,29 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
   };
 
   /**
-   * translateX만 사용하는 순수 좌우 흔들림.
-   * - animation 속성을 건드리지 않음 → fadeIn forwards fill 유지 → opacity 불변
-   * - transform: translateX만 인라인으로 직접 조작 → 버튼이 절대 사라지지 않음
-   * - 연속 클릭 시에도 타이머를 초기화해 항상 처음부터 재시작
+   * CSS @keyframes btnShake + classList 방식으로 흔들림 실행.
+   * 1) shake 클래스 제거 → reflow 강제(offsetWidth) → 클래스 재추가
+   *    : 연속 클릭에도 매번 애니메이션이 처음부터 재시작됨
+   * 2) animationend 이벤트에서 클래스 제거 → 원래 상태 완전 복구
+   * 3) CSS 단에서 opacity:1 명시 → fadeIn forwards 충돌 원천 차단
    */
   const triggerShake = () => {
     const btn = activeTab === "personal" ? scentBtnRef.current : memoryBtnRef.current;
     if (!btn) return;
 
-    // 이전 shake가 진행 중이면 타이머 전부 취소하고 transform 초기화 후 재시작
-    shakeTimersRef.current.forEach((id) => window.clearTimeout(id));
-    shakeTimersRef.current = [];
-    btn.style.transform = "";
+    // 1. 기존 shake 클래스 제거 (이미 흔들리는 중이어도 재시작 가능하게)
+    btn.classList.remove("shake");
+    // 2. reflow 강제 – 브라우저가 클래스 제거를 렌더에 반영하도록
+    void btn.offsetWidth;
+    // 3. shake 클래스 추가 → @keyframes btnShake 즉시 시작
+    btn.classList.add("shake");
 
-    // translateX 프레임 시퀀스 (총 ~620ms)
-    // 첫 프레임에 큰 폭으로 즉시 이동해 "안 돼!" 느낌을 강조
-    // opacity / scale / translateY 변경 없음
-    const frames: [number, number][] = [
-      [0,    -14],  // ← 즉시 크게 왼쪽
-      [60,   +14],  // → 오른쪽
-      [120,  -12],  // ← 왼쪽 (감쇠 시작)
-      [180,  +12],  // → 오른쪽
-      [240,  -9],
-      [300,  +9],
-      [360,  -6],
-      [420,  +6],
-      [480,  -3],
-      [540,   0],   // 원위치
-    ];
-
-    frames.forEach(([delay, x]) => {
-      const id = window.setTimeout(() => {
-        btn.style.transform = `translateX(${x}px)`;
-      }, delay);
-      shakeTimersRef.current.push(id);
-    });
-
-    // 마지막 프레임 후 인라인 style 제거 → 완전히 원래 상태로 복귀
-    const cleanupId = window.setTimeout(() => {
-      btn.style.transform = "";
-      shakeTimersRef.current = [];
-    }, 620);
-    shakeTimersRef.current.push(cleanupId);
+    // 4. 애니메이션 종료 후 클래스 제거 → 원래 상태 완전 복구
+    const onEnd = () => {
+      btn.classList.remove("shake");
+      btn.removeEventListener("animationend", onEnd);
+    };
+    btn.addEventListener("animationend", onEnd);
   };
 
   const startRecommendationFlow = (e: React.MouseEvent) => {
