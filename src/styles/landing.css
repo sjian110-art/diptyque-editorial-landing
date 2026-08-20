@@ -685,43 +685,62 @@ html, body {
   pointer-events: auto; /* Block user interactions during opening animation */
 }
 
-/* Base Gate Panel style */
-.gate-panel {
+/* Door leaf wrappers (Left and Right, each containing 2 gate-slices acting as one unit) */
+.gate-door {
+  position: absolute;
+  top: 0;
   width: 50vw;
   height: 100vh;
+  display: flex;
+  overflow: hidden;
+  will-change: transform;
+  
+  /* 애니메이션 속도 요건: 전체 이동 약 1.3초로 무겁게 미끄러지도록 조정. Easing 감속 곡선 적용 */
+  transition: transform 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gate-door-left {
+  left: 0;
+  transform: translateX(0);
+}
+
+.gate-opening-overlay.open .gate-door-left {
+  transform: translateX(-100%);
+}
+
+.gate-door-right {
+  right: 0;
+  transform: translateX(0);
+  justify-content: flex-end; /* Align slices to the right to match symmetry */
+}
+
+.gate-opening-overlay.open .gate-door-right {
+  transform: translateX(100%);
+}
+
+/* Individual Gate Slice styling (Total 4 slices, 2 per door) */
+.gate-slice {
+  width: 26vw; /* Slightly wider than 25vw to allow overlap */
+  height: 100vh;
   background-image: url('/assets/steel.png');
+  
+  /* [중요] 가로로 Stretch 하지 않고 원본 비율을 보존하여 철봉 두께와 장식 비율 유지 */
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
   
   /* 디자인 요건: 은은하게 비치도록 투명도 설정 (10% 수준 완화) */
   opacity: 0.90;
   
-  /* 디자인 요건: 대비가 너무 강하지 않도록 살짝 줄여 콘텐츠보다 튀지 않게 조정 */
-  filter: contrast(0.82) brightness(1.05);
+  /* 디자인 요건: 대비가 너무 강하지 않도록 조절하여 콘텐츠보다 튀지 않게 조정 */
+  filter: contrast(0.80) brightness(1.03);
   
-  /* 애니메이션 속도 요건: 전체 이동 1.0초, 시작은 빠르고 끝은 서서히 무겁게 감속 */
-  transition: transform 1.0s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
+  flex-shrink: 0;
 }
 
-/* Left panel slices image on the left center, slides to the left */
-.gate-panel-left {
-  background-position: left center;
-  background-size: 200% 100%;
-  transform: translateX(0);
-}
-
-.gate-opening-overlay.open .gate-panel-left {
-  transform: translateX(-100%);
-}
-
-/* Right panel slices image on the right center, slides to the right */
-.gate-panel-right {
-  background-position: right center;
-  background-size: 200% 100%;
-  transform: translateX(0);
-}
-
-.gate-opening-overlay.open .gate-panel-right {
-  transform: translateX(100%);
+/* 이미지끼리 아주 살짝 겹쳐 이음새가 보이지 않도록 마이너스 마진 오버랩 지정 */
+.gate-slice-2,
+.gate-slice-4 {
+  margin-left: -2vw;
 }
 

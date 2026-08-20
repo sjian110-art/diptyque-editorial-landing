@@ -31,15 +31,15 @@ const LandingPage: React.FC = () => {
 
   // 철장 문 열림 상태 스케줄러
   useEffect(() => {
-    // 0.4초간 정지 후 양옆으로 슬라이드 열림 시작
+    // 요건: 0.5초간 정지 후 양옆으로 슬라이드 열림 시작
     const openTimer = setTimeout(() => {
       setIsGateOpen(true);
-    }, 400);
+    }, 500);
 
-    // 1.5초 후 애니메이션이 완전히 끝나면 철장 DOM을 영구 제거
+    // 요건: 1.8초 후(0.5초 대기 + 1.3초 슬라이드 이동) 철장 DOM을 영구 제거
     const destroyTimer = setTimeout(() => {
       setIsGateActive(false);
-    }, 1500);
+    }, 1800);
 
     return () => {
       clearTimeout(openTimer);
@@ -89,8 +89,16 @@ const LandingPage: React.FC = () => {
       {/* Steel Gate Opening Overlay (Intro animation) */}
       {isGateActive && (
         <div className={`gate-opening-overlay ${isGateOpen ? "open" : ""}`}>
-          <div className="gate-panel gate-panel-left" />
-          <div className="gate-panel gate-panel-right" />
+          {/* Left door leaf (consists of 2 steel.png images, slides left as one) */}
+          <div className="gate-door gate-door-left">
+            <div className="gate-slice gate-slice-1" />
+            <div className="gate-slice gate-slice-2" />
+          </div>
+          {/* Right door leaf (consists of 2 steel.png images, slides right as one) */}
+          <div className="gate-door gate-door-right">
+            <div className="gate-slice gate-slice-3" />
+            <div className="gate-slice gate-slice-4" />
+          </div>
         </div>
       )}
       
