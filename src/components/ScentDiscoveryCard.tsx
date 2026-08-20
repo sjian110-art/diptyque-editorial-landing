@@ -92,20 +92,18 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [loadingDots, setLoadingDots] = useState("");
   const [recommendation, setRecommendation] = useState<Perfume | null>(null);
-  // Shake animation state for validation feedback
-  const [isShaking, setIsShaking] = useState(false);
   
   const previousRecRef = useRef<Perfume | null>(null);
   const dotsIntervalRef = useRef<number | null>(null);
-  const shakeTimerRef = useRef<number | null>(null);
+  // Refs for the submit buttons – used to trigger shake animation directly on DOM
+  // (avoids CSS animation restart issues with class-based approach)
+  const scentBtnRef = useRef<HTMLButtonElement | null>(null);
+  const memoryBtnRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     return () => {
       if (dotsIntervalRef.current !== null) {
         window.clearInterval(dotsIntervalRef.current);
-      }
-      if (shakeTimerRef.current !== null) {
-        window.clearTimeout(shakeTimerRef.current);
       }
     };
   }, []);
@@ -124,14 +122,27 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
     }
   };
 
+  /**
+   * 직접 DOM 조작으로 shake 애니메이션을 실행합니다.
+   * CSS class 방식 대비 장점:
+   *  - 다른 animation 룰과 충돌 없음
+   *  - 연속 클릭 시마다 애니메이션이 확실히 재시작됨
+   */
   const triggerShake = () => {
-    // 이미 흔들리는 중이면 무시 (debounce)
-    if (isShaking) return;
-    setIsShaking(true);
-    shakeTimerRef.current = window.setTimeout(() => {
-      setIsShaking(false);
-      shakeTimerRef.current = null;
-    }, 500);
+    const btn = activeTab === "personal" ? scentBtnRef.current : memoryBtnRef.current;
+    if (!btn) return;
+    // 1단계: animation 리셋 (None으로 설정해 브라우저가 재시작을 인지하게 함)
+    btn.style.animation = "none";
+    // 2단계: reflow 유발 (offsetWidth 읽기는 레이아웃을 강제함)
+    void btn.offsetWidth;
+    // 3단계: 새 animation 적용
+    btn.style.animation = "btnShake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both";
+    // 4단계: animation이 끊나면 style 다시 지움 (원래 상태 복원)
+    const onEnd = () => {
+      btn.style.animation = "";
+      btn.removeEventListener("animationend", onEnd);
+    };
+    btn.addEventListener("animationend", onEnd);
   };
 
   const startRecommendationFlow = (e: React.MouseEvent) => {
@@ -274,7 +285,8 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
             </div>
 
             <button 
-              className={`card-submit-btn ${isLoading ? "loading" : ""} ${isShaking ? "shake" : ""}`} 
+              ref={scentBtnRef}
+              className={`card-submit-btn ${isLoading ? "loading" : ""}`} 
               onClick={recommendation ? handleResetFlow : startRecommendationFlow}
               disabled={isLoading}
             >
@@ -331,7 +343,8 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
             </div>
 
             <button 
-              className={`card-submit-btn ${isLoading ? "loading" : ""} ${isShaking ? "shake" : ""}`} 
+              ref={memoryBtnRef}
+              className={`card-submit-btn ${isLoading ? "loading" : ""}`} 
               onClick={recommendation ? handleResetFlow : startRecommendationFlow}
               disabled={isLoading}
             >
