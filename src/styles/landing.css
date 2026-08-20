@@ -79,7 +79,7 @@ html, body {
 /* Header Styles (Seamless, borderless glass overlay with maximum transparency) */
 .landing-header {
   position: relative;
-  z-index: 10;
+  z-index: 100; /* Raised from 10 to always stay above the opening steel gate */
   height: 80px;
   width: 100%;
   display: flex;
@@ -668,5 +668,60 @@ html, body {
     max-width: 1920px;
     margin: 0 auto;
   }
+}
+
+/* ==========================================================================
+   Steel Gate Opening Intro Overlay
+   ========================================================================== */
+.gate-opening-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 90; /* Placed right below Header (z-index: 100) */
+  display: flex;
+  overflow: hidden;
+  pointer-events: auto; /* Block user interactions during opening animation */
+}
+
+/* Base Gate Panel style */
+.gate-panel {
+  width: 50vw;
+  height: 100vh;
+  background-image: url('/assets/steel.png');
+  background-repeat: no-repeat;
+  
+  /* 디자인 요건: 은은하게 비치도록 투명도 설정 (10% 수준 완화) */
+  opacity: 0.90;
+  
+  /* 디자인 요건: 대비가 너무 강하지 않도록 살짝 줄여 콘텐츠보다 튀지 않게 조정 */
+  filter: contrast(0.82) brightness(1.05);
+  
+  /* 애니메이션 속도 요건: 전체 이동 1.0초, 시작은 빠르고 끝은 서서히 무겁게 감속 */
+  transition: transform 1.0s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+/* Left panel slices image on the left center, slides to the left */
+.gate-panel-left {
+  background-position: left center;
+  background-size: 200% 100%;
+  transform: translateX(0);
+}
+
+.gate-opening-overlay.open .gate-panel-left {
+  transform: translateX(-100%);
+}
+
+/* Right panel slices image on the right center, slides to the right */
+.gate-panel-right {
+  background-position: right center;
+  background-size: 200% 100%;
+  transform: translateX(0);
+}
+
+.gate-opening-overlay.open .gate-panel-right {
+  transform: translateX(100%);
 }
 

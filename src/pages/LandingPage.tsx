@@ -17,12 +17,34 @@ const LandingPage: React.FC = () => {
   const [bottleIndex, setBottleIndex] = useState(0);
   const hasOpenedOnceRef = useRef(false);
 
+  // 철장 오프닝 인터랙션 상태
+  const [isGateOpen, setIsGateOpen] = useState(false);
+  const [isGateActive, setIsGateActive] = useState(true);
+
   // 1. 향수병 이미지들 초기에 전부 Preload (메모리 캐싱 완료)
   useEffect(() => {
     BOTTLE_IMAGES.forEach((src) => {
       const preloadedImage = new Image();
       preloadedImage.src = src;
     });
+  }, []);
+
+  // 철장 문 열림 상태 스케줄러
+  useEffect(() => {
+    // 0.4초간 정지 후 양옆으로 슬라이드 열림 시작
+    const openTimer = setTimeout(() => {
+      setIsGateOpen(true);
+    }, 400);
+
+    // 1.5초 후 애니메이션이 완전히 끝나면 철장 DOM을 영구 제거
+    const destroyTimer = setTimeout(() => {
+      setIsGateActive(false);
+    }, 1500);
+
+    return () => {
+      clearTimeout(openTimer);
+      clearTimeout(destroyTimer);
+    };
   }, []);
 
   // 2. 로고 클릭 시 호출되는 토글 및 이미지 스왑 핵심 로직
@@ -63,6 +85,14 @@ const LandingPage: React.FC = () => {
       <div className="landing-background-overlay" />
       
       <Header onLogoClick={handleLogoClick} />
+      
+      {/* Steel Gate Opening Overlay (Intro animation) */}
+      {isGateActive && (
+        <div className={`gate-opening-overlay ${isGateOpen ? "open" : ""}`}>
+          <div className="gate-panel gate-panel-left" />
+          <div className="gate-panel gate-panel-right" />
+        </div>
+      )}
       
       {/* Sliding Perfume Bottle (Fixed overlay on the left) */}
       <img
