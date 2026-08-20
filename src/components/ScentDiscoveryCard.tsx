@@ -114,14 +114,18 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
 
   const handleScentPillClick = (e: React.MouseEvent, pill: string) => {
     e.stopPropagation();
-    if (selectedScentPill !== pill) {
+    if (selectedScentPill === pill) {
+      setSelectedScentPill(null); // 토글 해제
+    } else {
       setSelectedScentPill(pill);
     }
   };
 
   const handleMemoryPillClick = (e: React.MouseEvent, pill: string) => {
     e.stopPropagation();
-    if (selectedMemoryPill !== pill) {
+    if (selectedMemoryPill === pill) {
+      setSelectedMemoryPill(null); // 토글 해제
+    } else {
       setSelectedMemoryPill(pill);
     }
   };
