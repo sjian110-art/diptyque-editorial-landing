@@ -97,15 +97,18 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
   const dotsIntervalRef = useRef<number | null>(null);
   const scentBtnRef = useRef<HTMLButtonElement | null>(null);
   const memoryBtnRef = useRef<HTMLButtonElement | null>(null);
-  // shake setTimeout IDs – animation 속성을 전혀 건드리지 않으므로 opacity 불변
-  const shakeTimersRef = useRef<number[]>([]);
+  // 진행 중인 shake Animation 인스턴스 (WAAPI)
+  const shakeAnimRef = useRef<Animation | null>(null);
 
   useEffect(() => {
     return () => {
       if (dotsIntervalRef.current !== null) {
         window.clearInterval(dotsIntervalRef.current);
       }
-      shakeTimersRef.current.forEach(id => window.clearTimeout(id));
+      // 언마운트 시 진행 중인 shake 취소
+      if (shakeAnimRef.current) {
+        shakeAnimRef.current.cancel();
+      }
     };
   }, []);
 
@@ -124,49 +127,53 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
   };
 
   /**
-   * animation 속성을 전혀 사용하지 않는 순수 좌우 흔들림.
+   * Web Animations API (btn.animate()) 방식으로 좌우 흔들림 실행.
    *
-   * classList + reflow 방식은 reflow 순간 .tab-pane>* fadeIn이
-   * 재시작되며 opacity:0 플래시가 발생함 → 이 방식으로 완전 해결.
+   * ─ 왜 이 방식인가 ─
+   * CSS Cascade 우선순위: CSS Animation (fadeIn) > Inline Style (transform)
+   * → setTimeout + btn.style.transform 은 fadeIn forwards에 밀려 보이지 않음
    *
-   * CSS transition에서 transform이 제거되어 있으므로
-   * 각 setTimeout의 translateX 변경이 즉시 렌더링됨.
+   * WAAPI 우선순위: WAAPI > CSS Animation
+   * → btn.animate()는 fadeIn을 합법적으로 덮어씀 (transform만)
+   *
+   * fill: "none" 으로 opacity는 절대 건드리지 않음
+   * → 종료 후 fadeIn forwards 상태 (opacity:1) 자동 복원, 플래시 없음
+   *
+   * classList/reflow 없음 → fadeIn 재시작 없음 → 깜빡임 완전 차단
    */
   const triggerShake = () => {
     const btn = activeTab === "personal" ? scentBtnRef.current : memoryBtnRef.current;
     if (!btn) return;
 
-    // 진행 중인 shake가 있으면 전부 취소 후 재시작
-    shakeTimersRef.current.forEach(id => window.clearTimeout(id));
-    shakeTimersRef.current = [];
-    btn.style.transform = "";
+    // 연속 클릭 시 이전 shake 즉시 취소 후 재시작
+    if (shakeAnimRef.current) {
+      shakeAnimRef.current.cancel();
+      shakeAnimRef.current = null;
+    }
 
-    // 좌우 프레임 시퀀스: translateX만 조작, opacity/scale/display 절대 미변
-    const frames: [number, number][] = [
-      [0,   -12],
-      [60,   12],
-      [120, -10],
-      [180,  10],
-      [240,  -8],
-      [300,   8],
-      [360,  -4],
-      [420,   4],
-      [480,   0],
-    ];
+    shakeAnimRef.current = btn.animate(
+      [
+        { transform: "translateX(0)",     offset: 0 },
+        { transform: "translateX(-12px)", offset: 0.11 },
+        { transform: "translateX(12px)",  offset: 0.22 },
+        { transform: "translateX(-10px)", offset: 0.33 },
+        { transform: "translateX(10px)",  offset: 0.44 },
+        { transform: "translateX(-8px)",  offset: 0.55 },
+        { transform: "translateX(8px)",   offset: 0.66 },
+        { transform: "translateX(-4px)",  offset: 0.77 },
+        { transform: "translateX(4px)",   offset: 0.88 },
+        { transform: "translateX(0)",     offset: 1 },
+      ],
+      {
+        duration: 600,
+        easing: "ease-in-out",
+        fill: "none", // 종료 후 CSS 원래 상태 복원, opacity 불변
+      }
+    );
 
-    frames.forEach(([ms, x]) => {
-      const id = window.setTimeout(() => {
-        btn.style.transform = x === 0 ? "" : `translateX(${x}px)`;
-      }, ms);
-      shakeTimersRef.current.push(id);
-    });
-
-    // 마지막 프레임 후 inline style 완전 제거 → 원래 상태 복원
-    const cleanupId = window.setTimeout(() => {
-      btn.style.transform = "";
-      shakeTimersRef.current = [];
-    }, 540);
-    shakeTimersRef.current.push(cleanupId);
+    shakeAnimRef.current.onfinish = () => {
+      shakeAnimRef.current = null;
+    };
   };
 
   const startRecommendationFlow = (e: React.MouseEvent) => {
