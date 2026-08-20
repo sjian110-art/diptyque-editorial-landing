@@ -140,16 +140,20 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
     shakeTimersRef.current = [];
     btn.style.transform = "";
 
-    // translateX 프레임 시퀀스 (총 ~560ms, opacity/scale 변경 없음)
+    // translateX 프레임 시퀀스 (총 ~620ms)
+    // 첫 프레임에 큰 폭으로 즉시 이동해 "안 돼!" 느낌을 강조
+    // opacity / scale / translateY 변경 없음
     const frames: [number, number][] = [
-      [0,   -9],
-      [70,   9],
-      [140, -7],
-      [210,  7],
-      [280, -5],
-      [350,  5],
-      [420, -3],
-      [490,  0],
+      [0,    -14],  // ← 즉시 크게 왼쪽
+      [60,   +14],  // → 오른쪽
+      [120,  -12],  // ← 왼쪽 (감쇠 시작)
+      [180,  +12],  // → 오른쪽
+      [240,  -9],
+      [300,  +9],
+      [360,  -6],
+      [420,  +6],
+      [480,  -3],
+      [540,   0],   // 원위치
     ];
 
     frames.forEach(([delay, x]) => {
@@ -163,7 +167,7 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
     const cleanupId = window.setTimeout(() => {
       btn.style.transform = "";
       shakeTimersRef.current = [];
-    }, 560);
+    }, 620);
     shakeTimersRef.current.push(cleanupId);
   };
 
