@@ -729,11 +729,11 @@ html, body {
   background-position: center;
   background-repeat: no-repeat;
   
-  /* 디자인 요건: 은은하게 비치도록 투명도 설정 (10% 수준 완화) */
-  opacity: 0.90;
+  /* 디자인 요건: 은은하게 비치도록 투명도 설정 (무광 재질 맞춤 0.88) */
+  opacity: 0.88;
   
-  /* 디자인 요건: 대비가 너무 강하지 않도록 조절하여 콘텐츠보다 튀지 않게 조정 */
-  filter: contrast(0.80) brightness(1.03);
+  /* 디자인 요건: 반사광과 유광 하이라이트를 줄이고 묵직한 무광 블랙(Matte Black) 느낌을 주도록 톤 조절 */
+  filter: contrast(0.70) brightness(0.65) grayscale(1);
   
   flex-shrink: 0;
 }
