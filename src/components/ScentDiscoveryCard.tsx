@@ -95,15 +95,17 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
   
   const previousRecRef = useRef<Perfume | null>(null);
   const dotsIntervalRef = useRef<number | null>(null);
-  // Refs to the submit buttons – for direct DOM class manipulation on shake
   const scentBtnRef = useRef<HTMLButtonElement | null>(null);
   const memoryBtnRef = useRef<HTMLButtonElement | null>(null);
+  // shake setTimeout IDs – animation 속성을 전혀 건드리지 않으므로 opacity 불변
+  const shakeTimersRef = useRef<number[]>([]);
 
   useEffect(() => {
     return () => {
       if (dotsIntervalRef.current !== null) {
         window.clearInterval(dotsIntervalRef.current);
       }
+      shakeTimersRef.current.forEach(id => window.clearTimeout(id));
     };
   }, []);
 
@@ -122,29 +124,49 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
   };
 
   /**
-   * CSS @keyframes btnShake + classList 방식으로 흔들림 실행.
-   * 1) shake 클래스 제거 → reflow 강제(offsetWidth) → 클래스 재추가
-   *    : 연속 클릭에도 매번 애니메이션이 처음부터 재시작됨
-   * 2) animationend 이벤트에서 클래스 제거 → 원래 상태 완전 복구
-   * 3) CSS 단에서 opacity:1 명시 → fadeIn forwards 충돌 원천 차단
+   * animation 속성을 전혀 사용하지 않는 순수 좌우 흔들림.
+   *
+   * classList + reflow 방식은 reflow 순간 .tab-pane>* fadeIn이
+   * 재시작되며 opacity:0 플래시가 발생함 → 이 방식으로 완전 해결.
+   *
+   * CSS transition에서 transform이 제거되어 있으므로
+   * 각 setTimeout의 translateX 변경이 즉시 렌더링됨.
    */
   const triggerShake = () => {
     const btn = activeTab === "personal" ? scentBtnRef.current : memoryBtnRef.current;
     if (!btn) return;
 
-    // 1. 기존 shake 클래스 제거 (이미 흔들리는 중이어도 재시작 가능하게)
-    btn.classList.remove("shake");
-    // 2. reflow 강제 – 브라우저가 클래스 제거를 렌더에 반영하도록
-    void btn.offsetWidth;
-    // 3. shake 클래스 추가 → @keyframes btnShake 즉시 시작
-    btn.classList.add("shake");
+    // 진행 중인 shake가 있으면 전부 취소 후 재시작
+    shakeTimersRef.current.forEach(id => window.clearTimeout(id));
+    shakeTimersRef.current = [];
+    btn.style.transform = "";
 
-    // 4. 애니메이션 종료 후 클래스 제거 → 원래 상태 완전 복구
-    const onEnd = () => {
-      btn.classList.remove("shake");
-      btn.removeEventListener("animationend", onEnd);
-    };
-    btn.addEventListener("animationend", onEnd);
+    // 좌우 프레임 시퀀스: translateX만 조작, opacity/scale/display 절대 미변
+    const frames: [number, number][] = [
+      [0,   -12],
+      [60,   12],
+      [120, -10],
+      [180,  10],
+      [240,  -8],
+      [300,   8],
+      [360,  -4],
+      [420,   4],
+      [480,   0],
+    ];
+
+    frames.forEach(([ms, x]) => {
+      const id = window.setTimeout(() => {
+        btn.style.transform = x === 0 ? "" : `translateX(${x}px)`;
+      }, ms);
+      shakeTimersRef.current.push(id);
+    });
+
+    // 마지막 프레임 후 inline style 완전 제거 → 원래 상태 복원
+    const cleanupId = window.setTimeout(() => {
+      btn.style.transform = "";
+      shakeTimersRef.current = [];
+    }, 540);
+    shakeTimersRef.current.push(cleanupId);
   };
 
   const startRecommendationFlow = (e: React.MouseEvent) => {
