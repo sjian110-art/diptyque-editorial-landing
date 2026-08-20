@@ -744,3 +744,27 @@ html, body {
   margin-left: -2vw;
 }
 
+/* ==========================================================================
+   Custom Scent Cursor Styles (Hide Default Cursor)
+   ========================================================================== */
+html, body, .landing-page-container {
+  cursor: none !important;
+}
+
+/* 마우스 포인터 기본 브라우저 커서 강제 무력화 */
+a, 
+button, 
+input, 
+select, 
+textarea, 
+iframe,
+[role="button"], 
+.nav-item, 
+.header-user, 
+.scent-pill, 
+.experience-btn, 
+.card-tab-btn, 
+.header-logo, 
+.footer-logo {
+  cursor: none !important;
+}

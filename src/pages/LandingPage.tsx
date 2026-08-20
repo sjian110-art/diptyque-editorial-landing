@@ -3,6 +3,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import LiveAppPreview from "../components/LiveAppPreview";
 import EnvelopeExperience from "../components/EnvelopeExperience";
+import ScentCursor from "../components/ScentCursor";
 
 const BOTTLE_IMAGES = [
   "/assets/Diptyque_bottle.png",
@@ -81,6 +82,8 @@ const LandingPage: React.FC = () => {
 
   return (
     <div className="landing-page-container">
+      <ScentCursor />
+      
       {/* Background image overlay to match premium aesthetic */}
       <div className="landing-background-overlay" />
       
