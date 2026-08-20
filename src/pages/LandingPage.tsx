@@ -31,15 +31,15 @@ const LandingPage: React.FC = () => {
 
   // 철장 문 열림 상태 스케줄러
   useEffect(() => {
-    // 요건: 0.5초간 정지 후 양옆으로 슬라이드 열림 시작
+    // 요건: 0.8초간 웅장하게 정지 대기 후 양옆으로 슬라이드 열림 시작
     const openTimer = setTimeout(() => {
       setIsGateOpen(true);
-    }, 500);
+    }, 800);
 
-    // 요건: 1.8초 후(0.5초 대기 + 1.3초 슬라이드 이동) 철장 DOM을 영구 제거
+    // 요건: 3.4초 후(0.8초 대기 + 2.5초 슬라이드 이동 + 여유 마진 0.1초) 철장 DOM을 영구 제거
     const destroyTimer = setTimeout(() => {
       setIsGateActive(false);
-    }, 1800);
+    }, 3400);
 
     return () => {
       clearTimeout(openTimer);

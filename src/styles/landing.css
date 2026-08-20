@@ -695,8 +695,8 @@ html, body {
   overflow: hidden;
   will-change: transform;
   
-  /* 애니메이션 속도 요건: 전체 이동 약 1.3초로 무겁게 미끄러지도록 조정. Easing 감속 곡선 적용 */
-  transition: transform 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+  /* 애니메이션 속도 요건: 전체 이동 약 2.5초로 무겁고 웅장하게 미끄러지도록 조정. Easing 가감속 곡선 적용 */
+  transition: transform 2.5s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 .gate-door-left {
