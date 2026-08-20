@@ -96,15 +96,18 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
   const previousRecRef = useRef<Perfume | null>(null);
   const dotsIntervalRef = useRef<number | null>(null);
   // Refs for the submit buttons – used to trigger shake animation directly on DOM
-  // (avoids CSS animation restart issues with class-based approach)
   const scentBtnRef = useRef<HTMLButtonElement | null>(null);
   const memoryBtnRef = useRef<HTMLButtonElement | null>(null);
+  // Accumulated setTimeout IDs for the shake sequence
+  const shakeTimersRef = useRef<number[]>([]);
 
   useEffect(() => {
     return () => {
       if (dotsIntervalRef.current !== null) {
         window.clearInterval(dotsIntervalRef.current);
       }
+      // shake 타이머 전부 정리
+      shakeTimersRef.current.forEach((id) => window.clearTimeout(id));
     };
   }, []);
 
@@ -123,26 +126,45 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
   };
 
   /**
-   * 직접 DOM 조작으로 shake 애니메이션을 실행합니다.
-   * CSS class 방식 대비 장점:
-   *  - 다른 animation 룰과 충돌 없음
-   *  - 연속 클릭 시마다 애니메이션이 확실히 재시작됨
+   * translateX만 사용하는 순수 좌우 흔들림.
+   * - animation 속성을 건드리지 않음 → fadeIn forwards fill 유지 → opacity 불변
+   * - transform: translateX만 인라인으로 직접 조작 → 버튼이 절대 사라지지 않음
+   * - 연속 클릭 시에도 타이머를 초기화해 항상 처음부터 재시작
    */
   const triggerShake = () => {
     const btn = activeTab === "personal" ? scentBtnRef.current : memoryBtnRef.current;
     if (!btn) return;
-    // 1단계: animation 리셋 (None으로 설정해 브라우저가 재시작을 인지하게 함)
-    btn.style.animation = "none";
-    // 2단계: reflow 유발 (offsetWidth 읽기는 레이아웃을 강제함)
-    void btn.offsetWidth;
-    // 3단계: 새 animation 적용
-    btn.style.animation = "btnShake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both";
-    // 4단계: animation이 끊나면 style 다시 지움 (원래 상태 복원)
-    const onEnd = () => {
-      btn.style.animation = "";
-      btn.removeEventListener("animationend", onEnd);
-    };
-    btn.addEventListener("animationend", onEnd);
+
+    // 이전 shake가 진행 중이면 타이머 전부 취소하고 transform 초기화 후 재시작
+    shakeTimersRef.current.forEach((id) => window.clearTimeout(id));
+    shakeTimersRef.current = [];
+    btn.style.transform = "";
+
+    // translateX 프레임 시퀀스 (총 ~560ms, opacity/scale 변경 없음)
+    const frames: [number, number][] = [
+      [0,   -9],
+      [70,   9],
+      [140, -7],
+      [210,  7],
+      [280, -5],
+      [350,  5],
+      [420, -3],
+      [490,  0],
+    ];
+
+    frames.forEach(([delay, x]) => {
+      const id = window.setTimeout(() => {
+        btn.style.transform = `translateX(${x}px)`;
+      }, delay);
+      shakeTimersRef.current.push(id);
+    });
+
+    // 마지막 프레임 후 인라인 style 제거 → 완전히 원래 상태로 복귀
+    const cleanupId = window.setTimeout(() => {
+      btn.style.transform = "";
+      shakeTimersRef.current = [];
+    }, 560);
+    shakeTimersRef.current.push(cleanupId);
   };
 
   const startRecommendationFlow = (e: React.MouseEvent) => {
