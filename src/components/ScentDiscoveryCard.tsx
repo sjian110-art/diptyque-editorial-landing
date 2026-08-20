@@ -92,14 +92,20 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [loadingDots, setLoadingDots] = useState("");
   const [recommendation, setRecommendation] = useState<Perfume | null>(null);
+  // Shake animation state for validation feedback
+  const [isShaking, setIsShaking] = useState(false);
   
   const previousRecRef = useRef<Perfume | null>(null);
   const dotsIntervalRef = useRef<number | null>(null);
+  const shakeTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     return () => {
       if (dotsIntervalRef.current !== null) {
         window.clearInterval(dotsIntervalRef.current);
+      }
+      if (shakeTimerRef.current !== null) {
+        window.clearTimeout(shakeTimerRef.current);
       }
     };
   }, []);
@@ -118,8 +124,28 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
     }
   };
 
+  const triggerShake = () => {
+    // 이미 흔들리는 중이면 무시 (debounce)
+    if (isShaking) return;
+    setIsShaking(true);
+    shakeTimerRef.current = window.setTimeout(() => {
+      setIsShaking(false);
+      shakeTimerRef.current = null;
+    }, 500);
+  };
+
   const startRecommendationFlow = (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    // ── 입력 검증: 현재 탭에서 아무것도 선택하지 않은 경우 차단 ──
+    const hasSelection =
+      activeTab === "personal" ? selectedScentPill !== null : selectedMemoryPill !== null;
+
+    if (!hasSelection) {
+      triggerShake();
+      return; // 검색 실행 ❌, 결과 표시 ❌
+    }
+    // ─────────────────────────────────────────────────────────────
     
     setIsLoading(true);
     setRecommendation(null);
@@ -248,7 +274,7 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
             </div>
 
             <button 
-              className={`card-submit-btn ${isLoading ? "loading" : ""}`} 
+              className={`card-submit-btn ${isLoading ? "loading" : ""} ${isShaking ? "shake" : ""}`} 
               onClick={recommendation ? handleResetFlow : startRecommendationFlow}
               disabled={isLoading}
             >
@@ -305,7 +331,7 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
             </div>
 
             <button 
-              className={`card-submit-btn ${isLoading ? "loading" : ""}`} 
+              className={`card-submit-btn ${isLoading ? "loading" : ""} ${isShaking ? "shake" : ""}`} 
               onClick={recommendation ? handleResetFlow : startRecommendationFlow}
               disabled={isLoading}
             >

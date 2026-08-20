@@ -514,6 +514,23 @@ html, body {
   }
 }
 
+/* Shake animation – validation feedback when no option is selected */
+@keyframes btnShake {
+  0%   { transform: translateX(0); }
+  14%  { transform: translateX(-7px); }
+  28%  { transform: translateX(7px); }
+  42%  { transform: translateX(-6px); }
+  56%  { transform: translateX(6px); }
+  70%  { transform: translateX(-4px); }
+  84%  { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+.card-submit-btn.shake {
+  animation: btnShake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  /* pointer-events 유지 – 흔들리는 동안에도 클릭 가능하나 검증 로직에서 재차 차단 */
+}
+
 /* Fade-in Animation */
 @keyframes fadeIn {
   from {
