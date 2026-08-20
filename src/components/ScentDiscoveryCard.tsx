@@ -7,7 +7,7 @@ interface Perfume {
 
 interface ScentDiscoveryCardProps {
   onSearchScent: (selections: string[]) => void;
-  onSearchMemory: (selections: string[]) => void;
+  onSearchMemory: (text: string) => void;
 }
 
 const EAU_DE_PARFUMS: Perfume[] = [
@@ -156,11 +156,11 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
       previousRecRef.current = selected;
       setRecommendation(selected);
 
-      // Callback triggers (passing as array to support parents signature)
+      // Callback triggers
       if (activeTab === "personal") {
         onSearchScent(selectedScentPill ? [selectedScentPill] : []);
       } else {
-        onSearchMemory(selectedMemoryPill ? [selectedMemoryPill] : []);
+        onSearchMemory(selectedMemoryPill || "");
       }
     }, 2500);
   };
