@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Outfit:wght@200;300;400;500;600&family=Noto+Serif+KR:wght@300;400;500;600;700;800;900&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Cinzel:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Outfit:wght@200;300;400;500;600&family=Noto+Serif+KR:wght@300;400;500;600;700;800;900&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap');
 
 /* Style Tokens & Variables */
 :root {
-  --font-serif: 'Playfair Display', 'Cinzel', 'Noto Serif KR', Georgia, serif;
-  --font-sans: 'Outfit', 'Inter', 'Noto Serif KR', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-brand: 'Libre Caslon Text', serif;
+  --font-serif: 'EB Garamond', 'Cinzel', 'Noto Serif KR', Georgia, serif;
+  --font-sans: 'EB Garamond', 'Noto Serif KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-brand: 'EB Garamond', serif;
   
   --color-bg-dark: #12161a;
   --color-bg-overlay: rgba(18, 22, 26, 0.45);
@@ -93,10 +93,10 @@ html, body {
 }
 
 .header-logo {
-  font-family: 'Libre Caslon Text', var(--font-serif);
-  font-size: 28px;
-  font-weight: 700; /* Bold as requested */
-  letter-spacing: -0.04em; /* Tight, premium letter spacing */
+  font-family: var(--font-brand);
+  font-size: 30px;
+  font-weight: 500; /* Thinner weight (Regular~Medium) */
+  letter-spacing: -0.065em; /* Narrower letter spacing */
   color: #000000; /* Black text color */
   cursor: default;
 }
@@ -162,10 +162,10 @@ html, body {
 }
 
 .footer-logo {
-  font-family: 'Libre Caslon Text', var(--font-serif);
-  font-size: 16px;
-  font-weight: 700; /* Bold as requested */
-  letter-spacing: -0.04em; /* Tight, premium letter spacing matching upper logo */
+  font-family: var(--font-brand);
+  font-size: 17px;
+  font-weight: 500; /* Thinner weight (Regular~Medium) */
+  letter-spacing: -0.065em; /* Narrower letter spacing matching upper logo */
   color: #FFFFFF; /* White text color */
 }
 
