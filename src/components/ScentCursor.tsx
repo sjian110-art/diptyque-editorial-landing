@@ -66,12 +66,9 @@ const ScentCursor: React.FC = () => {
       mouseRef.current.isMoving = true;
     };
 
-    // 3. 클릭 시 입자 퍼짐(Burst) 연출 - 부드러운 미스트 구름 확장
-    const handleMouseClick = (e: MouseEvent) => {
+    // 3. 입자 퍼짐(Burst) 연출 - 부드러운 미스트 구름 확장
+    const triggerBurst = (px: number, py: number) => {
       const burstCount = 35;
-      const px = e.clientX;
-      const py = e.clientY;
-
       for (let i = 0; i < burstCount; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 2.8 + 0.6; // 더 넓게 퍼지는 팽창 속도
@@ -96,16 +93,45 @@ const ScentCursor: React.FC = () => {
       }
     };
 
-    window.addEventListener("mouseover", handleMouseOver);
-    window.addEventListener("mouseout", handleMouseOut);
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("click", handleMouseClick);
+    const handleMouseClick = (e: MouseEvent) => {
+      triggerBurst(e.clientX, e.clientY);
+    };
+
+    // 4. Iframe 메시지 수신 핸들러 (Iframe 내 마우스 포인터 정보 전달 수신)
+    const handleIframeMessage = (e: MessageEvent) => {
+      const data = e.data;
+      if (!data) return;
+
+      if (data.type === "IFRAME_MOUSEMOVE" || data.type === "IFRAME_CLICK") {
+        const iframe = document.getElementById("live-app-iframe");
+        if (!iframe) return;
+
+        const rect = iframe.getBoundingClientRect();
+        const absoluteX = rect.left + data.clientX;
+        const absoluteY = rect.top + data.clientY;
+
+        if (data.type === "IFRAME_MOUSEMOVE") {
+          mouseRef.current.x = absoluteX;
+          mouseRef.current.y = absoluteY;
+          mouseRef.current.isMoving = true;
+        } else if (data.type === "IFRAME_CLICK") {
+          triggerBurst(absoluteX, absoluteY);
+        }
+      }
+    };
+
+    window.addEventListener("mouseover", handleMouseOver, { passive: true });
+    window.addEventListener("mouseout", handleMouseOut, { passive: true });
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("click", handleMouseClick, { passive: true });
+    window.addEventListener("message", handleIframeMessage);
 
     return () => {
       window.removeEventListener("mouseover", handleMouseOver);
       window.removeEventListener("mouseout", handleMouseOut);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("click", handleMouseClick);
+      window.removeEventListener("message", handleIframeMessage);
     };
   }, []);
 
