@@ -390,6 +390,9 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
             <div className="result-essence-label">SELECTED ESSENCE</div>
             <div className="result-perfume-name">{recommendation.name}</div>
             <div className="result-perfume-line">{recommendation.line}</div>
+            <div className="result-essence-hint">
+              당신의 향은 어떤 모습일까요? 왼쪽 상단의 DIPTYQUE 로고를 눌러보세요.
+            </div>
           </div>
         )}
       </div>
