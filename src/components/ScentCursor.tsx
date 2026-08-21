@@ -74,8 +74,8 @@ const ScentCursor: React.FC = () => {
 
       for (let i = 0; i < burstCount; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 1.8 + 0.4; // 부드러운 팽창 속도
-        const size = Math.random() * 25 + 15; // 크기 2~3배로 확장 (15px ~ 40px)
+        const speed = Math.random() * 2.8 + 0.6; // 더 넓게 퍼지는 팽창 속도
+        const size = Math.random() * 35 + 25; // 크기 증가 (25px ~ 60px)
         const lifeDuration = Math.random() * 0.8 + 1.2; // 더 길게 유지 (1.2s ~ 2.0s)
 
         particlesRef.current.push({
@@ -89,7 +89,7 @@ const ScentCursor: React.FC = () => {
           rotation: Math.random() * Math.PI * 2,
           rotationSpeed: (Math.random() - 0.5) * 0.03, // 서서히 회전
           color: COLORS[Math.floor(Math.random() * COLORS.length)],
-          alpha: Math.random() * 0.12 + 0.06, // 미스트의 부드러움을 위해 저투명도 적용
+          alpha: Math.random() * 0.15 + 0.08, // 20~30% 더 진하게
           life: 1.0,
           decay: 1 / (60 * lifeDuration)
         });
@@ -145,25 +145,25 @@ const ScentCursor: React.FC = () => {
         const spawnCount = isHovered ? 4 : 2; 
         
         for (let i = 0; i < spawnCount; i++) {
-          // 마우스 주변에 자연스럽게 퍼지는 오프셋 설정
-          const offsetX = (Math.random() - 0.5) * 15;
-          const offsetY = (Math.random() - 0.5) * 15;
-          const size = Math.random() * 30 + 15; // 크기 2~3배로 확장 (15px ~ 45px)
+          // 마우스 주변에 더 넓게 퍼지는 오프셋 설정 (1.5~2배 공간 확장)
+          const offsetX = (Math.random() - 0.5) * 35;
+          const offsetY = (Math.random() - 0.5) * 35;
+          const size = Math.random() * 40 + 25; // 크기 확장 (25px ~ 65px)
           const lifeDuration = Math.random() * 1.0 + 1.5; // 더 천천히 사라지도록 수명 증가 (1.5s ~ 2.5s)
 
           particlesRef.current.push({
             x: mouse.x + offsetX,
             y: mouse.y + offsetY,
-            // 흩날림 물리: 마우스 방향에 살짝 퍼지는 속도 부여
-            vx: (Math.random() - 0.5) * 0.4,
-            vy: (Math.random() - 0.5) * 0.4 - 0.15, // 미세한 공기 상승 부력
+            // 흩날림 물리: 마우스 방향에 더 넓게 퍼지는 속도 부여
+            vx: (Math.random() - 0.5) * 0.7,
+            vy: (Math.random() - 0.5) * 0.7 - 0.15, // 미세한 공기 상승 부력
             size,
             radiusX: size,
             radiusY: size * (0.6 + Math.random() * 0.4), // 미세한 타원형 비틀기
             rotation: Math.random() * Math.PI * 2,
             rotationSpeed: (Math.random() - 0.5) * 0.02, // 서서히 회전하는 값
             color: COLORS[Math.floor(Math.random() * COLORS.length)],
-            alpha: Math.random() * 0.08 + 0.04, // 4% ~ 12%의 매우 희미하고 투명한 입자
+            alpha: Math.random() * 0.10 + 0.05, // 20~30% 더 진하게 (5% ~ 15% 투명도)
             life: 1.0,
             decay: 1 / (60 * lifeDuration)
           });
@@ -183,8 +183,8 @@ const ScentCursor: React.FC = () => {
 
         // 미세하게 유영하는(Wobble) 움직임 추가
         p.rotation += p.rotationSpeed;
-        p.vx += Math.sin(p.life * 8 + p.rotation) * 0.03;
-        p.vy += Math.cos(p.life * 8 + p.rotation) * 0.03;
+        p.vx += Math.sin(p.life * 8 + p.rotation) * 0.05;
+        p.vy += Math.cos(p.life * 8 + p.rotation) * 0.05;
 
         p.x += p.vx;
         p.y += p.vy;
