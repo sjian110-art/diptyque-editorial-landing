@@ -618,18 +618,18 @@ html, body {
 
 .hint-question {
   font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 400;
-  color: rgba(26, 26, 26, 0.55);
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(26, 26, 26, 0.75);
   margin-bottom: 6px;
   letter-spacing: -0.01em;
 }
 
 .hint-action {
   font-family: var(--font-sans);
-  font-size: 14.5px;
-  font-weight: 500;
-  color: rgba(26, 26, 26, 0.85);
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(26, 26, 26, 0.95);
   letter-spacing: -0.015em;
   word-break: keep-all;
   display: flex;
