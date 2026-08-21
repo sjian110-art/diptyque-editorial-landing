@@ -95,6 +95,7 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
   
   const previousRecRef = useRef<Perfume | null>(null);
   const dotsIntervalRef = useRef<number | null>(null);
+  const recommendationTimeoutRef = useRef<number | null>(null);
   const scentBtnRef = useRef<HTMLButtonElement | null>(null);
   const memoryBtnRef = useRef<HTMLButtonElement | null>(null);
   // 진행 중인 shake Animation 인스턴스 (WAAPI)
@@ -104,6 +105,9 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
     return () => {
       if (dotsIntervalRef.current !== null) {
         window.clearInterval(dotsIntervalRef.current);
+      }
+      if (recommendationTimeoutRef.current !== null) {
+        window.clearTimeout(recommendationTimeoutRef.current);
       }
       // 언마운트 시 진행 중인 shake 취소
       if (shakeAnimRef.current) {
@@ -197,7 +201,8 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
     }, 500);
 
     // Wait 2.5 seconds to recommend
-    setTimeout(() => {
+    recommendationTimeoutRef.current = window.setTimeout(() => {
+      recommendationTimeoutRef.current = null;
       if (dotsIntervalRef.current !== null) {
         window.clearInterval(dotsIntervalRef.current);
         dotsIntervalRef.current = null;
@@ -231,6 +236,14 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
 
   const handleResetFlow = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (recommendationTimeoutRef.current !== null) {
+      window.clearTimeout(recommendationTimeoutRef.current);
+      recommendationTimeoutRef.current = null;
+    }
+    if (dotsIntervalRef.current !== null) {
+      window.clearInterval(dotsIntervalRef.current);
+      dotsIntervalRef.current = null;
+    }
     setSelectedScentPill(null);
     setSelectedMemoryPill(null);
     setIsScentExpanded(false);
@@ -243,9 +256,24 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
   const handleTabChange = (e: React.MouseEvent, tab: "personal" | "memory") => {
     e.stopPropagation();
     setActiveTab(tab);
-    // Collapse layouts to fit sizes nicely on tab toggle
+    
+    // 모드 전환 시 진행 중인 모든 타이머/인터벌 취소 및 입력값, 결과값 초기화
+    if (recommendationTimeoutRef.current !== null) {
+      window.clearTimeout(recommendationTimeoutRef.current);
+      recommendationTimeoutRef.current = null;
+    }
+    if (dotsIntervalRef.current !== null) {
+      window.clearInterval(dotsIntervalRef.current);
+      dotsIntervalRef.current = null;
+    }
+
+    setSelectedScentPill(null);
+    setSelectedMemoryPill(null);
     setIsScentExpanded(false);
     setIsMemoryExpanded(false);
+    setIsLoading(false);
+    setRecommendation(null);
+    setLoadingDots("");
   };
 
   return (
