@@ -289,7 +289,7 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
           className={`card-tab-btn ${activeTab === "memory" ? "active" : ""}`}
           onClick={(e) => handleTabChange(e, "memory")}
         >
-          기억 속 향 찾기
+          기억 속 향 떠올리기
         </button>
       </div>
 
@@ -356,7 +356,7 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
           <div className="tab-pane fade-in-element">
             <div className="card-scroll-pane">
               <span className="card-subtitle uppercase-tracking">SCENT OF MEMORIES</span>
-              <h2 className="card-title">기억 속 향을 발견해보세요</h2>
+              <h2 className="card-title">기억 속 향을 떠올려보세요</h2>
               
               <div className="pills-grid" onClick={(e) => e.stopPropagation()}>
                 {DEFAULT_MEMORY_PILLS.map((pill) => {
