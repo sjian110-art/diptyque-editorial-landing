@@ -9,6 +9,7 @@ interface Particle {
   radiusX: number;
   radiusY: number;
   rotation: number;
+  rotationSpeed: number;
   color: string;
   alpha: number;
   life: number;
@@ -65,29 +66,30 @@ const ScentCursor: React.FC = () => {
       mouseRef.current.isMoving = true;
     };
 
-    // 3. 클릭 시 입자 퍼짐(Burst) 연출
+    // 3. 클릭 시 입자 퍼짐(Burst) 연출 - 부드러운 미스트 구름 확장
     const handleMouseClick = (e: MouseEvent) => {
-      const burstCount = 30; // 풍성하게 30개 퍼짐
+      const burstCount = 35;
       const px = e.clientX;
       const py = e.clientY;
 
       for (let i = 0; i < burstCount; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 2.5 + 0.8; // 부드럽고 가볍게 흩날리는 속도
-        const size = Math.random() * 6 + 2; // 2px ~ 8px
-        const lifeDuration = Math.random() * 0.4 + 0.8; // 0.8s ~ 1.2s
+        const speed = Math.random() * 1.8 + 0.4; // 부드러운 팽창 속도
+        const size = Math.random() * 25 + 15; // 크기 2~3배로 확장 (15px ~ 40px)
+        const lifeDuration = Math.random() * 0.8 + 1.2; // 더 길게 유지 (1.2s ~ 2.0s)
 
         particlesRef.current.push({
           x: px,
           y: py,
           vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - 0.2, // 아주 살짝 위로 뜸
+          vy: Math.sin(angle) * speed - 0.15, // 은은한 상승
           size,
           radiusX: size,
-          radiusY: size * (0.5 + Math.random() * 0.5), // 타원형 비틀기 비율
+          radiusY: size * (0.6 + Math.random() * 0.4), // 타원형 비틀기 비율
           rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.03, // 서서히 회전
           color: COLORS[Math.floor(Math.random() * COLORS.length)],
-          alpha: Math.random() * 0.5 + 0.4, // 투명도 다양화
+          alpha: Math.random() * 0.12 + 0.06, // 미스트의 부드러움을 위해 저투명도 적용
           life: 1.0,
           decay: 1 / (60 * lifeDuration)
         });
@@ -137,30 +139,31 @@ const ScentCursor: React.FC = () => {
 
       const mouse = mouseRef.current;
       
-      // 2. 마우스 움직임에 따른 풍성한 입자 생성
+      // 2. 마우스 움직임에 따른 풍성한 입자 생성 - 부드러운 미스트 흔적 생성
       if (mouse.isMoving) {
-        // 호버 중일 때는 입자를 2.5배 더 많이 뿜음
-        const spawnCount = isHovered ? 6 : 3; 
+        // 호버 중일 때는 입자를 좀 더 많이 생성
+        const spawnCount = isHovered ? 4 : 2; 
         
         for (let i = 0; i < spawnCount; i++) {
-          // 마우스 미세 진동 오프셋을 두어 공기 중에 자연스럽게 흩뿌려짐
-          const offsetX = (Math.random() - 0.5) * 8;
-          const offsetY = (Math.random() - 0.5) * 8;
-          const size = Math.random() * 6 + 2; // 2px ~ 8px
-          const lifeDuration = Math.random() * 0.4 + 0.8; // 0.8s ~ 1.2s
+          // 마우스 주변에 자연스럽게 퍼지는 오프셋 설정
+          const offsetX = (Math.random() - 0.5) * 15;
+          const offsetY = (Math.random() - 0.5) * 15;
+          const size = Math.random() * 30 + 15; // 크기 2~3배로 확장 (15px ~ 45px)
+          const lifeDuration = Math.random() * 1.0 + 1.5; // 더 천천히 사라지도록 수명 증가 (1.5s ~ 2.5s)
 
           particlesRef.current.push({
             x: mouse.x + offsetX,
             y: mouse.y + offsetY,
-            // 흩날림 물리: 기본적으로 뒤따라오는 선과 무작위 흩어짐을 믹스
-            vx: (Math.random() - 0.5) * 0.8,
-            vy: (Math.random() - 0.5) * 0.8 - 0.2, // 미세한 공기 상승 부력 효과
+            // 흩날림 물리: 마우스 방향에 살짝 퍼지는 속도 부여
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4 - 0.15, // 미세한 공기 상승 부력
             size,
             radiusX: size,
-            radiusY: size * (0.5 + Math.random() * 0.5), // 타원형 매칭
+            radiusY: size * (0.6 + Math.random() * 0.4), // 미세한 타원형 비틀기
             rotation: Math.random() * Math.PI * 2,
+            rotationSpeed: (Math.random() - 0.5) * 0.02, // 서서히 회전하는 값
             color: COLORS[Math.floor(Math.random() * COLORS.length)],
-            alpha: Math.random() * 0.5 + 0.3,
+            alpha: Math.random() * 0.08 + 0.04, // 4% ~ 12%의 매우 희미하고 투명한 입자
             life: 1.0,
             decay: 1 / (60 * lifeDuration)
           });
@@ -173,10 +176,15 @@ const ScentCursor: React.FC = () => {
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         
-        // 마찰 저항 및 아주 느린 위쪽 부력 연출
-        p.vx *= 0.97;
-        p.vy *= 0.97;
-        p.vy -= 0.015; // 아주 가벼운 기체 상승 작용
+        // 공기 저항 및 부드러운 속도 감쇠
+        p.vx *= 0.98;
+        p.vy *= 0.98;
+        p.vy -= 0.008; // 아주 가벼운 기체 상승 작용
+
+        // 미세하게 유영하는(Wobble) 움직임 추가
+        p.rotation += p.rotationSpeed;
+        p.vx += Math.sin(p.life * 8 + p.rotation) * 0.03;
+        p.vy += Math.cos(p.life * 8 + p.rotation) * 0.03;
 
         p.x += p.vx;
         p.y += p.vy;
@@ -188,19 +196,25 @@ const ScentCursor: React.FC = () => {
           continue;
         }
 
-        // 그리기
+        // 그리기 (Gaussian Blur 느낌의 Radial Gradient 적용)
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.scale(p.radiusX / p.size, p.radiusY / p.size);
+
+        // 중심은 밝고 외곽으로 갈수록 자연스럽게 퍼지는 무경계 그라데이션
+        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size);
+        grad.addColorStop(0, `${p.color}${p.alpha * p.life})`);
+        grad.addColorStop(0.25, `${p.color}${p.alpha * p.life * 0.75})`);
+        grad.addColorStop(0.5, `${p.color}${p.alpha * p.life * 0.35})`);
+        grad.addColorStop(0.75, `${p.color}${p.alpha * p.life * 0.1})`);
+        grad.addColorStop(1, `${p.color}0)`);
+
         ctx.beginPath();
-        // 타원형 및 원형 입자 융합 그리기
-        ctx.ellipse(p.x, p.y, p.radiusX, p.radiusY, p.rotation, 0, Math.PI * 2);
-        
-        // 투명도 그라데이션 페이드아웃 결합
-        ctx.fillStyle = `${p.color}${p.alpha * p.life})`;
-        
-        // 가스/향기 같은 은은한 흐림(Gaseous Blur)을 위해 섀도우 블러 가동
-        ctx.shadowBlur = p.size * 0.7;
-        ctx.shadowColor = `${p.color}${p.alpha * p.life * 0.8})`;
-        
+        ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
         ctx.fill();
+        ctx.restore();
       }
 
       // 섀도우 블러 초기화 (다음 루프 영향 방지)
