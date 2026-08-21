@@ -11,6 +11,17 @@ const BOTTLE_IMAGES = [
   "/assets/Diptyque_bottle3.png",
   "/assets/Diptyque_bottle4.png",
   "/assets/Diptyque_bottle5.png",
+  "/assets/Diptyque_bottle6.png",
+  "/assets/Diptyque_bottle7.png",
+  "/assets/Diptyque_bottle8.png",
+  "/assets/Diptyque_bottle9.png",
+  "/assets/Diptyque_bottle10.png",
+  "/assets/Diptyque_bottle11.png",
+  "/assets/Diptyque_bottle12.png",
+  "/assets/Diptyque_bottle13.png",
+  "/assets/Diptyque_bottle14.png",
+  "/assets/Diptyque_bottle15.png",
+  "/assets/Diptyque_bottle16.png",
 ];
 
 const LandingPage: React.FC = () => {
