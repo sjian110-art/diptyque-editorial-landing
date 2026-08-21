@@ -421,7 +421,21 @@ const ScentDiscoveryCard: React.FC<ScentDiscoveryCardProps> = ({
             <div className="result-essence-hint">
               <p className="hint-question">당신의 향은 어떤 모습일까요?</p>
               <p className="hint-action">
-                왼쪽 상단의 <span className="hint-brand-name">DIPTYQUE</span> 로고를 눌러보세요 <span className="hint-arrow">↖</span>
+                왼쪽 상단의 <span className="hint-brand-name">DIPTYQUE</span> 로고를 눌러보세요
+                <span className="hint-arrow">
+                  <svg 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="3" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    className="hint-arrow-svg"
+                  >
+                    <line x1="17" y1="17" x2="7" y2="7"></line>
+                    <polyline points="7 13 7 7 13 7"></polyline>
+                  </svg>
+                </span>
               </p>
             </div>
           </div>
